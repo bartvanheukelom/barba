@@ -2,5 +2,6 @@
 
 Bart's Bash utilities
 
-- All `.sh` files in this directory only declare functions, and are meant to be sourced from (included into) other Bash scripts
+- Source `barba.sh` to enable importing modules from the library
+- Source `script_entry` to do that, and also include common modules and do default script entry setup
 - All functions are agnostic to the presence of `set -e` a.k.a. `set -o errexit`
