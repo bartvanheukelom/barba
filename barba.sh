@@ -1,4 +1,7 @@
-# source this file to enable importing of modules
+# source this file to enable importing of modules, e.g.:
+#
+#     #!/bin/bash
+#     source "$(dirname "$0")/barba/barba.sh"
 
 barba_root="$(dirname "$BASH_SOURCE")"
 barba_root="$(cd "$barba_root" && pwd)"
