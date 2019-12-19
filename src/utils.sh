@@ -18,6 +18,10 @@ error() {
     return "$code"
 }
 
+fun_error() {
+    error "${FUNCNAME[1]}" "$@"
+}
+
 # errexit $msg [$code=$?]
 #     Prints $msg and exits with $code, which defaults to the previous return code, if that's an error, otherwise 1
 errexit() {
@@ -201,4 +205,12 @@ file_test_rw() {
     
     # clear the test
     truncate --size=0 "$filename"
+}
+
+prefix() {
+    local prefix="$1"
+    local line
+    while IFS= read -r line; do
+        echo "${prefix}${line}"
+    done
 }
