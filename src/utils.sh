@@ -98,7 +98,13 @@ rc_setup_leave() {
 
 # cd to the directory of the main script
 cd_here() {
-    cd "$(dirname "$0")"
+    cd "$(scriptdir)"
+}
+
+# prints the directory containing the main script
+scriptdir() {
+    # TODO better
+    echo "$(dirname "$0")"
 }
 
 # prints the name of the main script
@@ -110,10 +116,34 @@ log() {
 	echo "[$(scriptname)] $@"
 }
 
+# TODO remove, does not play well with set -u
 check_args() {
 	local check=$1
 	local usage=$2
-    [[ "$check" != "" ]] || error "usage: $(scriptname) $usage"
+    [[ "$check" != "" ]] || usage_error "$usage"
+}
+
+check_usage() {
+    local argcount="$1"
+    shift
+    (( $argcount == $# )) || usage_error "$@"
+}
+
+check_fun_args() {
+    local argcount="$1"
+    local funname="$2"
+    shift 2
+    (( $argcount == $# )) || args_error "$funname" "$@"
+}
+
+usage_error() {
+    args_error "$(scriptname)" "$@"
+}
+
+args_error() {
+    local callable="$1"
+    shift
+    error "usage: $callable $*" 1
 }
 
 # returns 1 if its stdin is empty
@@ -138,4 +168,37 @@ is_date() {
 
 require_date() {
 	is_date "$1" || error "'$1' is not a valid date"
+}
+
+# tmpfile_open
+#     Opens a temporary file and assigns its name to the global variable 'tmpfile_name'.
+#     The file exists in /dev/shm and is guaranteed to be deleted if this process dies.
+#     Example usage:
+#         tmpfile_open && my_temp="$tmpfile_name" || false
+tmpfile_open() {
+    local mktfn
+    local fd
+    mktfn=$(mktemp -p /dev/shm) &&
+        file_test_rw "$mktfn" &&
+        exec {fd}<>"$mktfn" &&
+        rm "$mktfn" &&
+        tmpfile_name="/proc/self/fd/$fd" &&
+        file_test_rw "$tmpfile_name"
+}
+
+# file_test_rw $filename
+#     checks if the file given by $filename is writable and readable.
+#     OVERWRITES THE CONTENTS OF THE FILE!
+file_test_rw() {
+    local filename="$1"
+    local str="file_test_rw $PPID"
+
+    # write string to the file
+    echo "$str" > "$filename" || error "file_test_rw $filename failed on write" || return
+    
+    # check if same string can be read back
+    [[ "$(cat "$filename")" == "$str" ]] || error "file_test_rw $filename failed on read" || return
+    
+    # clear the test
+    truncate --size=0 "$filename"
 }
