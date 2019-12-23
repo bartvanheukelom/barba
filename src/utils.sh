@@ -19,7 +19,13 @@ error() {
 }
 
 fun_error() {
-    error "${FUNCNAME[1]}" "$@"
+    local msg="${FUNCNAME[1]} $1"; shift
+    error "$msg" "$@"
+}
+
+trace_error() {
+    local msg="In ${FUNCNAME[1]} at [${BASH_SOURCE[1]}:${BASH_LINENO[0]}]: $1"; shift
+    error "$msg" "$@"
 }
 
 # errexit $msg [$code=$?]
