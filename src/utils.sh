@@ -213,6 +213,14 @@ file_test_rw() {
     truncate --size=0 "$filename"
 }
 
+ensure_empty_dir() {
+    local dir="$1"
+    if [[ -d "$dir" ]]; then
+        rm -rf "$dir"
+    fi
+    mkdir -p "$dir"
+}
+
 prefix() {
     local prefix="$1"
     local line

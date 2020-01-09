@@ -1,5 +1,5 @@
 #!/bin/bash
-source "$(dirname "$0")/barba.sh"  # UPDATE THIS PATH FOR YOUR OWN SCRIPT
+source "$(dirname "$0")/barba.sh" || exit 100  # UPDATE THIS PATH FOR YOUR OWN SCRIPT
 import utils
 
 main() {
